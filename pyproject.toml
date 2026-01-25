@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "endless-terminals"
+version = "0.1.0"
+description = "Scaling RL Environments for Terminal Agents"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic",
+    "tenacity",
+    "tqdm",
+    "openai",
+    "datasets",
+    "transformers",
+]
+
+[project.optional-dependencies]
+harbor = [
+    "harbor",
+]
+train = [
+    "ray",
+    "hydra-core",
+    "omegaconf",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["endless_harbor", "endless.*", "generator", "generator.*"]
