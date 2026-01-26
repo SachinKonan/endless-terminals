@@ -2,7 +2,7 @@
 
 **Scaling RL Environments for Terminal Agents**
 
-[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/XXXX.XXXXX)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-red)](https://arxiv.org/abs/2601.16443)
 [![Dataset](https://img.shields.io/badge/Dataset-HuggingFace-yellow)](https://huggingface.co/collections/obiwan96/endless-terminals)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -77,7 +77,7 @@ Configs: `base.yaml` (Llama-3.2-3B), `base_qwen.yaml` (Qwen2.5-7B), `base_qwen3_
 @article{gandhi2025endless,
     title={Endless Terminals: Scaling RL Environments for Terminal Agents},
     author={Gandhi, Kanishk and Garg, Shivam and Goodman, Noah D. and Papailiopoulos, Dimitris},
-    journal={arXiv preprint arXiv:XXXX.XXXXX},
+    journal={arXiv preprint arXiv:2601.16443},
     year={2025}
 }
 ```
