@@ -1,0 +1,143 @@
+Bootstrap: docker
+From: nvidia/cuda:12.4.0-devel-ubuntu22.04
+
+%labels
+    Author endless-terminals
+    Description Base container for research agent benchmark. Includes Ray cluster,
+                ML frameworks (JAX, PyTorch), and standard research tooling.
+                The entire environment — agent shell, Ray head, Ray workers —
+                runs inside this single container.
+
+%environment
+    # CUDA
+    export CUDA_HOME=/usr/local/cuda
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+    export PATH=/usr/local/cuda/bin:$PATH
+
+    # Ray
+    export RAY_ADDRESS=127.0.0.1:6379
+    export RAY_DEDUP_LOGS=0
+
+    # Python
+    export PATH=/usr/local/bin:/home/user/.local/bin:$PATH
+
+    # Agent workspace
+    export HOME=/home/user
+    export WORKSPACE=/home/user/workspace
+    export RESULTS_DIR=/home/user/results
+    export BUDGET_FILE=/home/user/.budget.json
+
+%post
+    # ---- System packages ----
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3.12 python3.12-venv python3.12-dev python3-pip \
+        git git-lfs curl wget vim nano htop tmux tree jq \
+        build-essential cmake pkg-config \
+        libffi-dev libssl-dev \
+        && rm -rf /var/lib/apt/lists/*
+
+    # Make python3.12 the default
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
+    ln -sf /usr/bin/python3.12 /usr/local/bin/python
+    ln -sf /usr/bin/python3.12 /usr/local/bin/python3
+
+    # ---- pip + uv ----
+    python -m pip install --upgrade pip setuptools wheel
+    pip install uv
+
+    # ---- Ray ----
+    pip install "ray[default]>=2.40"
+
+    # ---- ML frameworks ----
+    # JAX with CUDA support
+    pip install "jax[cuda12]>=0.4.35,<0.6"
+    pip install equinox>=0.11.12 optax>=0.2.4 jaxtyping>=0.2.36
+
+    # PyTorch with CUDA support (for repos that need it)
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+
+    # ---- Common research dependencies ----
+    pip install \
+        numpy>=2.0 \
+        scipy \
+        pandas \
+        matplotlib \
+        seaborn \
+        scikit-learn \
+        datasets \
+        transformers \
+        tokenizers \
+        wandb \
+        hydra-core>=1.3.2 \
+        omegaconf \
+        einops>=0.8.0 \
+        tqdm \
+        tensorboard \
+        h5py \
+        zarr>=3.0 \
+        orbax-checkpoint \
+        grain>=0.2.7 \
+        pytest
+
+    # ---- Research agent CLI tools ----
+    # These get bind-mounted or copied in at instance start,
+    # but we create the directory structure now.
+    mkdir -p /opt/researcher/cli
+    mkdir -p /home/user/workspace
+    mkdir -p /home/user/results
+    mkdir -p /data
+
+    # ---- User setup ----
+    # Agent runs as non-root user
+    useradd -m -s /bin/bash -d /home/user user || true
+    chmod 755 /home/user
+
+%startscript
+    # This runs when `apptainer instance start` is called.
+    # Start Ray head node with the GPUs visible to this container.
+    NUM_GPUS=$(python3 -c "
+    try:
+        import subprocess
+        out = subprocess.check_output(['nvidia-smi', '-L'], text=True)
+        print(len([l for l in out.strip().split('\n') if l.strip()]))
+    except Exception:
+        print(0)
+    ")
+
+    echo "Starting Ray head node with ${NUM_GPUS} GPUs..."
+    ray start --head \
+        --num-gpus="${NUM_GPUS}" \
+        --dashboard-host=0.0.0.0 \
+        --disable-usage-stats \
+        --include-dashboard=true
+
+    # Initialize budget tracking
+    if [ ! -f /home/user/.budget.json ]; then
+        python3 -c "
+import json, os
+budget = {
+    'total_gpu_hours': float(os.environ.get('GPU_BUDGET_HOURS', '1.0')),
+    'used_gpu_seconds': 0.0,
+    'max_concurrent_jobs': int(os.environ.get('MAX_CONCURRENT_JOBS', '4')),
+    'jobs': []
+}
+with open('/home/user/.budget.json', 'w') as f:
+    json.dump(budget, f, indent=2)
+"
+    fi
+
+    echo "Research environment ready."
+    # Keep container alive
+    tail -f /dev/null
+
+%runscript
+    echo "Research Agent Container"
+    echo "========================"
+    echo "Ray cluster: $RAY_ADDRESS"
+    echo "Workspace:   $WORKSPACE"
+    echo "Results:     $RESULTS_DIR"
+    echo ""
+    echo "Use 'ray status' to check cluster state."
+    echo "Use 'cluster-submit' to submit experiments."
+    exec /bin/bash "$@"
