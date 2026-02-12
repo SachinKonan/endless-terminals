@@ -10,8 +10,7 @@ import sys
 
 sys.path.insert(0, str(Path().resolve()))
 
-from generator import chat_completion
-from generator.test_deployments import test_gpt4o_deployments, chat_completion_batch
+from generator import chat_completion_batch
 
 SYSTEM_MSG = """You are creating realistic Linux-terminal tasks for training an AI agent.
 

@@ -98,8 +98,6 @@ class EndlessAgent(BaseAgent):
         max_episodes: int = 64,
         max_time_sec: float = 600,
         max_completion_tokens: int = 2048,
-        api_version: str = "2024-12-01-preview",
-        instance: str = "",
         agent_version: str = "1.0.0",
         **kwargs,
     ):
@@ -113,14 +111,10 @@ class EndlessAgent(BaseAgent):
             max_episodes: Maximum number of action turns.
             max_time_sec: Maximum wall-clock time for task execution.
             max_completion_tokens: Maximum tokens per completion.
-            api_version: API version for Azure OpenAI.
-            instance: Azure deployment instance.
             agent_version: Version string for this agent.
         """
         super().__init__(logs_dir, model_name, *args, **kwargs)
         self._model_name = model_name or "obiwan96/ota-350"
-        self.api_version = api_version
-        self.instance = instance
         self.max_completion_tokens = max_completion_tokens
         self.temperature = temperature
         self._max_episodes = max_episodes
@@ -362,8 +356,6 @@ class EndlessAgent(BaseAgent):
                 model=self._model_name,
                 temperature=self.temperature,
                 max_tokens=self.max_completion_tokens,
-                api_version=self.api_version,
-                instance=self.instance,
                 num_completions=1,
                 max_concurrency=1,
             )

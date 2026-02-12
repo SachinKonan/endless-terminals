@@ -12,9 +12,6 @@ can assert the exact expected end state.
 """
 from __future__ import annotations
 
-import argparse
-import json
-import random
 import textwrap
 from pathlib import Path
 import sys
@@ -23,7 +20,7 @@ from typing import Optional
 # Ensure the project root is on ``sys.path`` so ``generator.chat_completion`` can
 # be imported when this script is executed from arbitrary working directories.
 sys.path.insert(0, str(Path().resolve()))
-from generator import chat_completion, parse_python_code, check_python_code, chat_completion_batch
+from generator import  parse_python_code, check_python_code, chat_completion_batch
 
 # ---------------------------------------------------------------------------
 # LLM prompt scaffolding
@@ -76,8 +73,6 @@ def generate_test_templates_batch(
     responses = chat_completion_batch(
         messages,
         model=model,
-        instance=instance,
-        api_version=api_version,
         temperature=temperature,
         max_tokens=max_tokens,
         num_completions=1,

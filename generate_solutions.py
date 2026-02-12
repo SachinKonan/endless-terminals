@@ -27,8 +27,6 @@ class SolutionConfig:
     num_solutions: int = 128
     max_actions: int = 16
     model: str = "Qwen/Qwen3-32B"
-    instance: str = "https://reasoning-eastus2.openai.azure.com/"
-    api_version: str = "2024-12-01-preview"
     solution_temperature: float = 1.0
     verbose: bool = False
     num_tasks: int = 1
@@ -122,8 +120,6 @@ def process_task(task_dir: str, cfg: SolutionConfig):
             task_path=str(task_json_path),
             max_actions=cfg.max_actions,
             model=cfg.model,
-            instance=cfg.instance,
-            api_version=cfg.api_version,
             temperature=cfg.solution_temperature,
             max_tokens=cfg.max_tokens,
             save_dir=str(solutions_dir),
@@ -166,8 +162,6 @@ def parse_args(argv: Optional[List[str]] = None) -> SolutionConfig:
         "--max-actions", type=int, default=16, help="Max shell actions per solution attempt"
     )
     ap.add_argument("--model", type=str, default="Qwen/Qwen3-32B")
-    ap.add_argument("--instance", type=str, default="https://reasoning-eastus2.openai.azure.com/")
-    ap.add_argument("--api-version", type=str, default="2024-12-01-preview")
     ap.add_argument("--solution-temperature", type=float, default=1.0)
     ap.add_argument(
         "--max-tokens", type=int, default=2048, help="Max tokens for the solution agent"
@@ -191,13 +185,14 @@ def main():
     """Main entry point for solution generation."""
     cfg = parse_args()
 
-    if cfg.filter_solved:
-        all_entries = list(Path(cfg.tasks_dir).iterdir())
-        task_dirs = [
+    all_entries = list(Path(cfg.tasks_dir).iterdir())
+    task_dirs = [
             d
             for d in tqdm(all_entries, desc="Scanning task directories", total=len(all_entries))
             if d.name.startswith("task_")
         ]
+    if cfg.filter_solved:
+
         print(f"Filtering to tasks with o3 pass@16 > 0, prefilter: {len(task_dirs)}")
 
         def _o3_pass16_gt_zero(task_dir: str) -> bool:
