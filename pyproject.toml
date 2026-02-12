@@ -28,4 +28,4 @@ train = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["endless_harbor", "endless.*", "generator", "generator.*"]
+include = ["endless_harbor", "endless.*", "generator", "generator.*", "train", "train.*"]

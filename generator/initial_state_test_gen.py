@@ -1,16 +1,13 @@
 """Generate pytest *template* for validating the initial OS state."""
 from __future__ import annotations
 
-import argparse
-import json
 import textwrap
 from pathlib import Path
-import random
 from typing import Optional
 import sys
 
 sys.path.insert(0, str(Path().resolve()))
-from generator import chat_completion, parse_python_code, check_python_code
+from generator import parse_python_code, check_python_code
 
 SYSTEM_MSG = """
 You are a senior Python engineer who writes robust pytest suites. 

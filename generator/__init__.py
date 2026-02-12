@@ -29,7 +29,7 @@ MAX_RETRIES = 5
 
 # Cache the client to avoid recreating it
 @lru_cache(maxsize=None)
-def get_client(instance: str, api_version: str) -> AzureOpenAI:
+def get_client() -> AzureOpenAI:
     """Get or create a cached vllm OpenAI client."""
 
     client = OpenAI(
@@ -41,8 +41,6 @@ def get_client(instance: str, api_version: str) -> AzureOpenAI:
 def chat_completion_batch(
     messages: List[List[Dict[str, str]]],
     model: str | None = None,
-    instance: str = "gcr/preview",
-    api_version: str = "2024-12-01-preview",
     temperature: float = 0.0,
     max_tokens: int = 1024,
     num_completions: int = 1,

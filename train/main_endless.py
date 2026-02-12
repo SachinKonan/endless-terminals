@@ -9,7 +9,7 @@ from skyrl_gym.envs import register
 def skyrl_entrypoint(cfg: DictConfig):
    register(
       id="endless",
-      entry_point="skyrl.sky_endless:SkyRLContainerEnv", 
+      entry_point="train.sky_endless:SkyRLContainerEnv", 
    )
 
    exp = BasePPOExp(cfg)

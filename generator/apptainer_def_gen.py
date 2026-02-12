@@ -184,8 +184,6 @@ def iterate_def_template_batch(
     responses = chat_completion_batch(
         messages,
         model=model,
-        instance=instance,
-        api_version=api_version,
         temperature=temperature,
         max_tokens=max_tokens,
         num_completions=1,
