@@ -197,7 +197,7 @@ def check_megatron_checkpoint_path(model_path):
             pp_size = pp_rank + 1
     return sharded_dirs, tp_size, pp_size
 
-def convert_megatron_checkpoints_to_hfmodes():
+def convert_megatron_checkpoints_to_hfmodels():
     local_path = args.local_dir
     
     model_ckpt_path = get_model_checkpoint_path(local_path)
@@ -407,6 +407,6 @@ if __name__ == '__main__':
     if args.backend == "fsdp":
         convert_fsdp_checkpoints_to_hfmodels()
     elif args.backend == "megatron":
-        convert_megatron_checkpoints_to_hfmodes()
+        convert_megatron_checkpoints_to_hfmodels()
     else:
         raise NotImplementedError(f"{args.backend} not supported")

@@ -630,7 +630,6 @@ def main():
         task_dirs = task_dirs[args.start_at:args.start_at + args.num_tasks] 
         # replace path /data/v-kangandhi/endless with /home/v-kangandhi/
         task_dirs = [Path(str(task_dir).replace("/data/v-kangandhi/endless", "/home/v-kangandhi")) for task_dir in task_dirs]
-        breakpoint()
     else:
         # Normal task selection logic
         task_dirs = [Path(args.task_dir) / f for f in os.listdir(args.task_dir) if "task" in f]

@@ -223,7 +223,6 @@ def generate_templates_batch(
     Returns a list of dicts with keys ``description`` and ``truth``. Any
     failed requests are skipped.
     """
-    from generator import run_async_batch
 
     messages: list[list[dict[str, str]]] = []
     for _ in range(batch_size):
